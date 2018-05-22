@@ -1,7 +1,6 @@
 import json
 import os
 import time
-from watson_machine_learning_client import WatsonMachineLearningAPIClient
 
 
 class Experiment:
@@ -25,11 +24,9 @@ class Experiment:
         self.training_runs = []
         self.training_references = []
 
-
-        self.wml_client = WatsonMachineLearningAPIClient(studio_utils.get_wml_credentials())
-        print("WML client version: %s" % self.wml_client.version)
-
         cos_credentials = studio_utils.get_cos_credentials()
+        self.wml_client = studio_utils.get_wml_client()
+
         self.experiment_metadata = {
                     self.wml_client.repository.ExperimentMetaNames.NAME: experiment_name,
                     self.wml_client.repository.ExperimentMetaNames.DESCRIPTION: experiment_description,
@@ -124,8 +121,8 @@ class Experiment:
 
         # Use json to pretty print a summary
         summary = {
-                    "experiment_run_guid" : self.experiment_guid,
-                    "experiment_guid": self.experiment_run_guid
+                    "experiment_run_guid" : self.experiment_run_guid,
+                    "experiment_guid": self.experiment_guid
                   }
         summary["training_runs"] = []
 
@@ -203,16 +200,6 @@ class TrainingRun:
     def get_guid(self):
         return self.guid
 
-    def download_training_log(self, working_directory):
-
-        remote_log_file = "%s/learner-1/training-log.txt" % self.get_guid
-        local_log_path = remote_log_file
-        if not os.path.isfile(local_log_path):
-            # Log not yet downloaded
-            self.studio_utils.get_cos_utils().download_file(self.results_bucket, remote_log_file, local_log_path)
-
-        return local_log_path
-
     def update_status(self):
 
         if self.status in ["pending"]:
@@ -222,37 +209,5 @@ class TrainingRun:
     def get_status(self):
         return self.status
 
-    def download_final_results(self, working_directory):
-
-        # Query the server for current status
-        training_run_details = self.wml_client.training.get_details(run_uid=self.guid)
-        #status = training_run_details[""]
-        #final_results = {"status" : status}
-
-        print("training_run_details", training_run_details)
-        #print("status for %s: " % (self.get_guid, status))
-
-        # if status is not "pending":
-
-        local_log_file = self.download_training_log(working_directory)
-        if os.path.isfile(local_log_file):  # Log was downloaded
-            with open(local_log_file, 'r') as file:
-                lines = file.readlines()
-                # Remove whitespace characters like `\n` at the end of each line
-                lines = [x.strip() for x in lines]
-                for line in lines:
-                    if line.startswith("Final train accuracy:"):
-                        self.train_accuracy = line.replace("Final train accuracy:", "").strip()
-                    elif line.startswith("Final train loss:"):
-                        self.train_loss = line.replace("Final train loss:", "").strip()
-                    elif line.startswith("Final test accuracy:"):
-                        self.test_accuracy = line.replace("Final test accuracy:", "").strip()
-                    elif line.startswith("Final test loss:"):
-                        self.test_loss = line.replace("Final test loss:", "").strip()
-                    elif line.startswith("Total train time:"):
-                        self.train_time = line.replace("Total train time:", "").strip()
-                file.close()
-
-        return final_results
 
 

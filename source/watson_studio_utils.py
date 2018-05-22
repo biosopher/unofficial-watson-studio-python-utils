@@ -2,6 +2,7 @@ import json
 import os
 import os.path
 from cos_utils import CosUtils
+from watson_machine_learning_client import WatsonMachineLearningAPIClient
 
 
 class WatsonStudioUtils:
@@ -34,13 +35,16 @@ class WatsonStudioUtils:
 
         self.cos_credentials = cos_credentials
         self.wml_credentials = wml_credentials
+
         self.cos_utils = CosUtils(self.cos_credentials, self.region)
+        self.wml_client = WatsonMachineLearningAPIClient(self.wml_credentials)
+        print("WML client version: %s" % self.wml_client.version)
 
     def get_cos_utils(self):
         return self.cos_utils
 
-    def get_wml_credentials(self):
-        return self.wml_credentials
+    def get_wml_client(self):
+        return self.wml_client
 
     def get_cos_credentials(self):
         return self.cos_credentials

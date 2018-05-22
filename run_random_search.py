@@ -1,4 +1,3 @@
-import json
 import sys
 import os
 
@@ -38,7 +37,7 @@ def create_random_search():
     search_count = 5
     return search.create_random_search(search_count)
 
-# Initializae various utilities that will make our lives easier
+# Initialize various utilities that will make our lives easier
 studio_utils = WatsonStudioUtils(region="us-south")
 studio_utils.configure_utilities_from_file()
 
@@ -70,6 +69,6 @@ experiment.execute()
 # Print the current status of the Experiment.
 experiment.print_experiment_summary()
 
-# Now you'll want to continuously monitor your experiment.  To do that from the command line, execute this:
-...
+# Now you'll want to continuously monitor your experiment.  To do that from the command line,
+# you should use the WML CLI.
 

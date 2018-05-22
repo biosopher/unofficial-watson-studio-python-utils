@@ -94,9 +94,9 @@ class CosUtils:
         all_objects = all_objects + response['Contents']
         return all_objects
 
-    def download_file(self, bucket, file_to_download, save_path):
+    def download_file(self, bucket, file_to_download, save_path, is_redownload=False):
 
-        if not os.path.exists(save_path):
+        if not os.path.exists(save_path) or is_redownload:
             with open(save_path, 'wb') as file:
                 print("Downloading %s" % file_to_download)  # "\r" allows us to overwrite the same line
                 try:
