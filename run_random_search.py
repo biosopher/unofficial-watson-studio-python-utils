@@ -42,8 +42,6 @@ studio_utils = WatsonStudioUtils(region="us-south")
 studio_utils.configure_utilities_from_file()
 
 project_utils = ProjectUtils(studio_utils)
-data_bucket = project_utils.get_data_bucket()
-results_bucket = project_utils.get_results_bucket()
 
 # Initialize our experiment
 experiment = Experiment("Fashion MNIST-Random",
@@ -70,5 +68,4 @@ experiment.execute()
 experiment.print_experiment_summary()
 
 # Now you'll want to continuously monitor your experiment.  To do that from the command line,
-# you should use the WML CLI.
-
+# you should use the WML CLI: bx ml monitor training-runs TRAINING_RUN_ID

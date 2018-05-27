@@ -12,8 +12,6 @@ studio_utils = WatsonStudioUtils(region="us-south")
 studio_utils.configure_utilities_from_file()
 
 project_utils = ProjectUtils(studio_utils)
-data_bucket = project_utils.get_data_bucket()
-results_bucket = project_utils.get_results_bucket()
 
 # Initialize our experiment
 experiment = Experiment("Fashion MNIST-dropout tests",
