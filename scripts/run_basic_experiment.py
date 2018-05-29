@@ -24,8 +24,8 @@ experiment = Experiment("Fashion MNIST-dropout tests",
                         project_utils)
 
 # Add two training runs to determine which dropout is best: 0.4 or 0.9
-run_1a_path = os.path.join("experiments", "fashion_mnist_dropout_0.4.zip")
-run_1b_path = os.path.join("experiments", "fashion_mnist_dropout_0.9.zip")
+run_1a_path = os.path.join("zips", "fashion_mnist_dropout_0.4.zip")
+run_1b_path = os.path.join("zips", "fashion_mnist_dropout_0.9.zip")
 
 experiment.add_training_run("Run #1", None, "python3 experiment.py", run_1a_path, "k80")
 experiment.add_training_run("Run #2", None, "python3 experiment.py", run_1b_path, "k80")

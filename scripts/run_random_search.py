@@ -55,7 +55,7 @@ experiment = Experiment("Fashion MNIST-Random",
 
 # Create random parameters to search then create a training run for each
 search = create_random_search()
-experiment_zip = os.path.join("experiments", "fashion_mnist_random_search.zip")
+experiment_zip = os.path.join("zips", "fashion_mnist_random_search.zip")
 for index, run_params in enumerate(search):
 
     run_name = "run_%d" % (index + 1)

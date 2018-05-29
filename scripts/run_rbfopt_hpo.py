@@ -65,7 +65,7 @@ rbfopt_search = get_rbfopt_search()
 #
 # Likewise if you want to use iterations instead of epochs, then you must also change that value both here as well
 # as in the "val_dict_list.json".
-experiment_zip = os.path.join("experiments", "fashion_mnist_rbfopt.zip")
+experiment_zip = os.path.join("zips", "fashion_mnist_rbfopt.zip")
 rbfopt_experiment_zip = rbfopt_search.save_rbfopt_hpo(experiment_zip,
                                                       run_count,
                                                       "accuracy",
@@ -84,4 +84,3 @@ experiment.print_experiment_summary()
 
 # Now you'll want to continuously monitor your experiment.  To do that from the command line,
 # you should use the WML CLI: bx ml monitor training-runs TRAINING_RUN_ID
-
