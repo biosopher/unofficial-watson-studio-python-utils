@@ -32,13 +32,13 @@ The next section provides detailed setup instructions, but if you're already fam
 ### Detailed Setup Instructions
 If you are new to Watson Studio or simply want more details on confguring the credentials files, then follow these steps:
 
-1. [Install IBM Cloud's developer utilities]()
+1. [Install IBM Cloud's developer utilities](https://console.bluemix.net/docs/cli/index.html#overview)
 2. Create WML services + credentials
-   - [Using Watson Studio UI]()
+   - [Using Watson Studio UI](wiki/Create-WML-Service)
    - [Using CLI]()
 3. Create COS service + credentials
-   - [Using Watson Studio UI]()
+   - [Using Watson Studio UI](wiki/Create-COS-Service)
    - [Using CLI]()
-4. [Create a new project and obtain the project id]()
+4. [Create a project in Watson Studio and save the project id]()
 5. [Execute example batch experiments]()
 
