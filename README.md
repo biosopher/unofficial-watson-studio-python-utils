@@ -14,16 +14,16 @@ experiment.add_training_run("cnn tests", hyperparams, "python3 experiment.py", "
 experiment.execute()
 ```
 
-These classes hide the underlying complexity yet the source code for everything's available so you can dig deeper as you advance.  
+The utility classes below hide the underlying complexity while the source code for everything's available so you can dig deeper as you advance.  
 
 <p align="center">
   <img width=500 src="media/utils_explained.png?">
 </p>
 
-To help you get started, [several sample experiments have been provided to show you how to use these utilities]().  These scripts are designed for quick execution from the command prompt but could be easily inserted into a notebook if desired.
+To help you get started, [sample experiments showing stanadard use cases are available](), are designed for quick execution from the command prompt but can be easily inserted into a notebook if desired.
 
 ### Quick Start
-If you want more detailed setup instructions, then see the next section, otherwise it's a simple 4-step process. (1) clone this repository then (2) [install the Watson Machine Learning (WML) python client](https://wml-api-pyclient-dev.mybluemix.net/).  (3) if you're already familiar with WML and Cloud Object Storage then you simply copy your credentials to [wml_credentials.json](settings/wml_credentials.json) and [cos_credentials.json](settings/cos_credentials.json), and (4) [execute the scripts showcasing sample batch experiments]().
+The next section provides detailed setup instructions, but if you're already familiar with Watson Studio and IBM Cloud service, it's a simple 4-step process. (1) clone this repository then (2) [install the Watson Machine Learning (WML) python client](https://wml-api-pyclient-dev.mybluemix.net/).  (3)  copy credentials to [wml_credentials.json](settings/wml_credentials.json) and [cos_credentials.json](settings/cos_credentials.json) then (4) [execute the sample batch experiments]().
 
 <p align="center">
   <img src="media/getting_started.png?">
