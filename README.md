@@ -2,8 +2,19 @@
 
 [instructions: detailed](#Detailed-Setup-Instructions)-->
 
-### Simplified Batch training with Watson Studio
-Batch training in Watson Studio was designed to be flexibile and fit into a range of pre-existing deep learning workflows. However this flexibility can be daunting for new users so these utils expose the core functions required to quickly start experiment while giving you the source code so you can dig deeper as you advance.
+### Simplified batch experimentation with Watson Studio
+Executing batch experiments in Watson Studio was designed to be flexibile and fit into a range of pre-existing workflows. However this flexibility can be daunting for new users.  Now executing experiments can be as simple as:
+
+```
+experiment = Experiment("My experiment", "Test hyperparameter range",
+                        "tensorflow", "1.5", "python","3.5",
+                        studio_utils, project_utils)
+                        
+experiment.add_training_run("cnn tests", hyperparams, "python3 experiment.py", "experiment.zip", "v100x2")
+experiment.execute()
+```
+
+Experiments plus other core functions are exposed so you can quickly start experimenting, yet the source code for everything's available so you can dig deeper as you advance.  These are the core classes that you'll work with:
 
 <p align="center">
   <img width=500 src="media/utils_explained.png?">
