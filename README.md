@@ -14,7 +14,7 @@ experiment.add_training_run("cnn tests", hyperparams, "python3 experiment.py", "
 experiment.execute()
 ```
 
-Experiments plus other core functions are exposed so you can quickly start experimenting, yet the source code for everything's available so you can dig deeper as you advance.  These are the core classes that you'll work with:
+These classes hide the underlying complexity yet the source code for everything's available so you can dig deeper as you advance.  
 
 <p align="center">
   <img width=500 src="media/utils_explained.png?">
