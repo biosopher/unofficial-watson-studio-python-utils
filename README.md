@@ -3,7 +3,7 @@
 [instructions: detailed](#Detailed-Setup-Instructions)-->
 
 ### Simplified batch experimentation with Watson Studio
-Executing batch experiments in Watson Studio was designed to be flexibile and fit into a range of pre-existing workflows. However this flexibility can be daunting for new users.  Now executing experiments can be as simple as:
+Executing batch experiments in Watson Studio was designed to be flexibile and to fit into a range of pre-existing workflows. However this flexibility can be daunting for new users.  Now executing experiments can be as simple as:
 
 ```
 experiment = Experiment("My experiment", "Test hyperparameter range",
