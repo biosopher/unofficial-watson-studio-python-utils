@@ -45,5 +45,6 @@ If you are new to Watson Studio or simply want more details on confguring the cr
 
 ### Optional Pages
 - [View results of your experiments](../../wiki/View-results-of-your-experiments)
+- [How to access TensorBoard?](How-to-access-TensorBoard)
 - [Install COS Python library and CLI](../../wiki/Install-COS-Python-library-and-CLI)
 - [Useful COS CLI commands](../../wiki/Useful-COS-CLI-commands)
