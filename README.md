@@ -41,7 +41,7 @@ If you are new to Watson Studio or simply want more details on confguring the cr
    - [Using Watson Studio UI](../../wiki/Create-COS-service-via-ui)
    - [Using CLI](../../wiki/Create-WML-service-via-CLI)
 5. [Create a project in Watson Studio and save the project id](../../wiki/Create-new-project-then-save-the-project-id)
-6. [Execute example batch experiments]()
+6. [Execute example batch experiments](../../wiki/Execute example batch experiments)
 
 ### Optional Pages
 - [Install COS Python library and CLI](../../wiki/Install-COS-Python-library-and-CLI)
