@@ -44,4 +44,5 @@ If you are new to Watson Studio or simply want more details on confguring the cr
 6. [Execute example batch experiments]()
 
 ### Optional Pages
-- [Install COS Python library and CLI][../../wiki/Install-COS-Python-library-and-CLI]
+- [Install COS Python library and CLI](../../wiki/Install-COS-Python-library-and-CLI)
+- [Useful COS CLI commands](../../wiki/Useful-COS-CLI-commands)
