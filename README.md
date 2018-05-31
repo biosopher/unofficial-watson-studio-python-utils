@@ -3,7 +3,7 @@
 [instructions: detailed](#Detailed-Setup-Instructions)-->
 
 ### Simplified batch experimentation with Watson Studio
-Executing batch experiments in Watson Studio was designed to be flexibile and to fit into a range of pre-existing workflows. However this flexibility can be daunting for new users.  Now executing experiments is as simple as:
+Executing batch experiments in Watson Studio was designed to be flexibile and to fit into a range of pre-existing workflows. However this flexibility can be daunting for new users.  Now, executing experiments is as simple as:
 
 ```
 experiment = Experiment("My experiment", "Test hyperparameter range",
@@ -14,7 +14,7 @@ experiment.add_training_run("cnn tests", hyperparams, "python3 experiment.py", "
 experiment.execute()
 ```
 
-The utility classes below hide the underlying complexity while the source code for everything's available so you can dig deeper as you advance.  
+This repository's utility classes (below) hide the underlying complexity while providing the source code so you can dig deeper as you advance.  
 
 <p align="center">
   <img width=500 src="media/utils_explained.png?">
@@ -32,13 +32,14 @@ The next section provides detailed setup instructions, but if you're already fam
 ### Detailed Setup Instructions
 If you are new to Watson Studio or simply want more details on confguring the credentials files, then follow these steps:
 
-1. [Install IBM Cloud's developer utilities](https://console.bluemix.net/docs/cli/index.html#overview)
-2. Create WML services + credentials
-   - [Using Watson Studio UI](wiki/Create-WML-Service)
-   - [Using CLI]()
-3. Create COS service + credentials
-   - [Using Watson Studio UI](wiki/Create-COS-Service)
-   - [Using CLI]()
-4. [Create a project in Watson Studio and save the project id]()
-5. [Execute example batch experiments]()
+1. [Setup your IBM Cloud developer utilities](wiki/Setup-your-IBM-Cloud-developer-tools)
+2. [Install WML's tooling](wiki/Install-WML's-tooling)
+3. Create WML services + credentials
+   - [Using Watson Studio UI](wiki/Create-WML-service-via-ui)
+   - [Using CLI](wiki/Create-WML-service-via-CLI)
+4. Create COS service + credentials
+   - [Using Watson Studio UI](wiki/Create-COS-service-via-ui)
+   - [Using CLI](wiki/Create-WML-service-via-CLI)
+5. [Create a project in Watson Studio and save the project id](wiki/Create-new-project-then-save-the-project-id)
+6. [Execute example batch experiments]()
 
