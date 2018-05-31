@@ -19,7 +19,7 @@ class ProjectUtils:
         self.data_bucket = None
         self.results_bucket = None
 
-        self.settings_directory = "settings"
+        self.settings_directory = os.path.join("..", "settings")
         os.makedirs(self.settings_directory, exist_ok=True)
 
         self.settings_file = os.path.join(self.settings_directory, "project.json")

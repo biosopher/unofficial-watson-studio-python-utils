@@ -2,7 +2,8 @@ import sys
 import os
 
 # Add source directory to the path as Python doesn't like sub-directories
-sys.path.insert(0, './source')
+source_path = os.path.join("..","source")
+sys.path.insert(0, source_path)
 from watson_studio_utils import WatsonStudioUtils
 from experiment_utils import Experiment
 from project_utils  import ProjectUtils
@@ -24,9 +25,10 @@ experiment = Experiment("Fashion MNIST-dropout tests",
                         project_utils)
 
 # Add two training runs to determine which dropout is best: 0.4 or 0.9
-run_1a_path = os.path.join("zips", "fashion_mnist_dropout_0.4.zip")
-run_1b_path = os.path.join("zips", "fashion_mnist_dropout_0.9.zip")
+run_1a_path = os.path.join("..","zips", "fashion_mnist_dropout_0.4.zip")
+run_1b_path = os.path.join("..","zips", "fashion_mnist_dropout_0.9.zip")
 
+# Specify different GPU types as "k80", "k80x2", "k80x4", "p100", ...
 experiment.add_training_run("Run #1", None, "python3 experiment.py", run_1a_path, "k80")
 experiment.add_training_run("Run #2", None, "python3 experiment.py", run_1b_path, "k80")
 

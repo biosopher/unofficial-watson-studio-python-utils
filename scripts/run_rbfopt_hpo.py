@@ -1,7 +1,8 @@
 import sys
 import os
 
-sys.path.insert(0, './source')
+source_path = os.path.join("..","source")
+sys.path.insert(0, source_path)
 from experiment_utils import Experiment
 from hpo_utils import HPOUtils
 from project_utils import ProjectUtils
@@ -65,7 +66,7 @@ rbfopt_search = get_rbfopt_search()
 #
 # Likewise if you want to use iterations instead of epochs, then you must also change that value both here as well
 # as in the "val_dict_list.json".
-experiment_zip = os.path.join("zips", "fashion_mnist_rbfopt.zip")
+experiment_zip = os.path.join("..","zips", "fashion_mnist_rbfopt.zip")
 rbfopt_experiment_zip = rbfopt_search.save_rbfopt_hpo(experiment_zip,
                                                       run_count,
                                                       "accuracy",
@@ -74,6 +75,7 @@ rbfopt_experiment_zip = rbfopt_search.save_rbfopt_hpo(experiment_zip,
 
 # Note: We don't pass hyperparameters for this run as RBFOpt will determine the hyperparameters to pass for
 # each training run as it intelligently explores the hyperparameter space for us.
+# Specify different GPU types as "k80", "k80x2", "k80x4", "p100", ...
 experiment.add_training_run("RBFOpt search", None, "python3 experiment.py", rbfopt_experiment_zip, "k80")
 
 # Execute experiment

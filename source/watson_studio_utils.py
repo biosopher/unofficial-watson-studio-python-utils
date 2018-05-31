@@ -16,9 +16,8 @@ class WatsonStudioUtils:
 
     def configure_utilities_from_file(self):
 
-        settings_directory = "settings"
-        cos_creds_file = os.path.join(settings_directory, "cos_credentials.json")
-        wml_creds_file = os.path.join(settings_directory, "wml_credentials.json")
+        cos_creds_file = os.path.join("..", "settings", "cos_credentials.json")
+        wml_creds_file = os.path.join("..", "settings", "wml_credentials.json")
         if not os.path.isfile(cos_creds_file):
             raise FileExistsError("COS credentials not found at %s" % cos_creds_file)
         if not os.path.isfile(wml_creds_file):

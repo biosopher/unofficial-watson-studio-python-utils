@@ -2,7 +2,8 @@ import sys
 import os
 
 # Add our source directory to the path as Python doesn't like sub-directories
-sys.path.insert(0, './source')
+source_path = os.path.join("..","source")
+sys.path.insert(0, source_path)
 from random_search import RandomSearch
 from watson_studio_utils import WatsonStudioUtils
 from project_utils import ProjectUtils
@@ -55,9 +56,10 @@ experiment = Experiment("Fashion MNIST-Random",
 
 # Create random parameters to search then create a training run for each
 search = create_random_search()
-experiment_zip = os.path.join("zips", "fashion_mnist_random_search.zip")
+experiment_zip = os.path.join("..","zips", "fashion_mnist_random_search.zip")
 for index, run_params in enumerate(search):
 
+    # Specify different GPU types as "k80", "k80x2", "k80x4", "p100", ...
     run_name = "run_%d" % (index + 1)
     experiment.add_training_run(run_name, run_params, "python3 experiment.py", experiment_zip, "k80")
 
