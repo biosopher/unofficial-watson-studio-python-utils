@@ -25,9 +25,9 @@ class CosUtils:
             raise ValueError("Region not recognized: %s. Acceptable values are `us-south` or `eu-gb`" % self.region)
 
         print("cos_service_endpoint: %s" % self.cos_credentials["cos_service_endpoint"])
-        #self.cos_client = boto3.client('s3', endpoint_url=self.cos_credentials["cos_service_endpoint"])
-        self.cos_client = boto3.client('s3', endpoint_url=self.cos_credentials["cos_service_endpoint"], aws_access_key_id=self.cos_credentials["cos_hmac_keys"]["access_key_id"], aws_secret_access_key=self.cos_credentials["cos_hmac_keys"]["secret_access_key"])
-
+        self.cos_client = boto3.client('s3', endpoint_url=self.cos_credentials["cos_service_endpoint"],
+                                             aws_access_key_id=self.cos_credentials["cos_hmac_keys"]["access_key_id"],
+                                             aws_secret_access_key=self.cos_credentials["cos_hmac_keys"]["secret_access_key"])
     def get_cos_client(self):
         return self.cos_client
 
