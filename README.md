@@ -43,7 +43,7 @@ If you are new to Watson Studio or simply want more details on confguring the cr
 5. [Create a project in Watson Studio and save the project id](../../wiki/Create-new-project-then-save-the-project-id)
 6. [Execute example batch experiments](../../wiki/Execute example batch experiments)
 
-### Optional Pages
+### Related and Very Useful Topics
 - [View results of your experiments](../../wiki/View-results-of-your-experiments)
 - [How to access TensorBoard?](../../wiki/How-to-access-TensorBoard)
 - [Install COS Python library and CLI](../../wiki/Install-COS-Python-library-and-CLI)
