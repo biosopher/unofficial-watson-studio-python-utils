@@ -33,10 +33,10 @@ The next section provides detailed setup instructions, but if you're already fam
 If you are new to Watson Studio or simply want more details on confguring the credentials files, then follow these steps:
 
 1. [Setup your IBM Cloud developer utilities](../../wiki/Setup-your-IBM-Cloud-developer-tools)
-2. [Install WML's tooling](../../wiki/Install-WML's-tooling)
-3. Create WML services + credentials
+2. Create WML services + credentials
    - [Using Watson Studio UI](../../wiki/Create-WML-service-via-ui)
    - [Using CLI](../../wiki/Create-WML-service-via-CLI)
+3. [Install WML's tooling](../../wiki/Install-WML's-tooling)
 4. Create COS service + credentials
    - [Using Watson Studio UI](../../wiki/Create-COS-service-via-ui)
    - [Using CLI](../../wiki/Create-WML-service-via-CLI)
