@@ -32,16 +32,17 @@ The next section provides detailed setup instructions, but if you're already fam
 ### Detailed Setup Instructions
 If you are new to Watson Studio or simply want more details on confguring the credentials files, then follow these steps:
 
-1. [Setup your IBM Cloud developer utilities](../../wiki/Setup-your-IBM-Cloud-developer-tools)
-2. Create WML services + credentials
+1. Clone this repository using the "Clone or Download" button above
+2. [Setup your IBM Cloud developer utilities](../../wiki/Setup-your-IBM-Cloud-developer-tools)
+3. Create WML services + credentials
    - [Using Watson Studio UI](../../wiki/Create-WML-service-via-ui)
    - [Using CLI](../../wiki/Create-WML-service-via-CLI)
-3. [Install WML's tooling](../../wiki/Install-WML's-tooling)
-4. Create COS service + credentials
+4. [Install WML's tooling](../../wiki/Install-WML's-tooling)
+5. Create COS service + credentials
    - [Using Watson Studio UI](../../wiki/Create-COS-service-via-ui)
    - [Using CLI](../../wiki/Create-WML-service-via-CLI)
-5. [Create a project in Watson Studio and save the project id](../../wiki/Create-new-project-then-save-the-project-id)
-6. [Execute example batch experiments](../../wiki/Execute-example-batch-experiments)
+6. [Create a project in Watson Studio and save the project id](../../wiki/Create-new-project-then-save-the-project-id)
+7. [Execute example batch experiments](../../wiki/Execute-example-batch-experiments)
 
 ### Related and Very Useful Topics
 - [View results of your experiments](../../wiki/View-results-of-your-experiments)
