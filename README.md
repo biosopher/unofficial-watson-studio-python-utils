@@ -20,7 +20,7 @@ This repository's utility classes (below) hide the underlying complexity while p
   <img width=500 src="media/utils_explained.png?">
 </p>
 
-To help you get started, [sample experiments are available for standard use cases]().  These samples are designed for quick execution from the command prompt but can be easily inserted into a notebook if desired.
+To help you get started, [sample experiments are available for standard use cases](../../wiki/Execute-example-batch-experiments).  These samples are designed for quick execution from the command prompt but can be easily inserted into a notebook if desired.
 
 ### Quick Start
 The next section provides detailed setup instructions, but if you're already familiar with Watson Studio and IBM Cloud service, it's a simple 4-step process. (1) clone this repository then (2) [install the Watson Machine Learning (WML) python client](https://wml-api-pyclient-dev.mybluemix.net/).  (3)  copy credentials to [wml_credentials.json](settings/wml_credentials.json) and [cos_credentials.json](settings/cos_credentials.json) then (4) [execute the sample batch experiments]().
