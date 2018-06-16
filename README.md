@@ -41,7 +41,7 @@ If you are new to Watson Studio or simply want more details on confguring the cr
 5. Create Cloud Object Storage (COS) service + credentials
    - Option A: [Using Watson Studio UI](../../wiki/Create-COS-service-via-ui)
    - Option B: [Using IBM Cloud CLI](../../wiki/Create-WML-service-via-CLI)
-6. [Install COS's tooling](../../wiki/Install-COS-Tooling)
+6. [Install COS's tooling](../../wiki/Install-COS-Python-library-and-CLI)
 7. [Create a project in Watson Studio and save the project id](../../wiki/Create-new-project-then-save-the-project-id)
 8. [Execute example batch experiments](../../wiki/Execute-example-batch-experiments)
 
