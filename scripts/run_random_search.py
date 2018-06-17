@@ -22,7 +22,7 @@ def create_random_search():
 
     search.add_power_range("num_filters_1", 5, 8, 2)  # 32 64 128 256
     search.add_power_range("num_filters_2", 4, 8, 2)  # 16 32 64 128 256
-    search.add_power_range("num_filters_3", 4, 8, 2)  # 16 32 64 128 256
+    search.add_power_range("num_filters_3", 4, 7, 2)  # 16 32 64 128
     search.add_step_range("filter_size_1", 2, 3, 1)
     search.add_step_range("filter_size_2", 2, 3, 1)
     search.add_step_range("filter_size_3", 2, 3, 1)
@@ -33,7 +33,7 @@ def create_random_search():
     search.add_step_range("dropout_2", 0.1, 0.9, 0.1)
     search.add_step_range("dropout_3", 0.1, 0.9, 0.1)
     search.add_step_range("dropout_4", 0.1, 0.9, 0.1)
-    search.add_power_range("dense_neurons_1", 6, 11, 2)  # 64 128 256 512 1024 2048
+    search.add_power_range("dense_1", 6, 11, 2)  # 64 128 256 512 1024 2048
 
     search_count = 5
     return search.create_random_search(search_count)
@@ -44,24 +44,43 @@ studio_utils.configure_utilities_from_file()
 
 project_utils = ProjectUtils(studio_utils)
 
+isPyTorch = False # else TensorFlow
+if isPyTorch:
+    framework = "pytorch"
+    version = "0.4"
+    experiment_zip = "dynamic_hyperparms_pt.zip"
+else:
+    framework = "tensorflow"
+    version = "1.5"
+    experiment_zip = "dynamic_hyperparms_tf.zip"
+
 # Initialize our experiment
-experiment = Experiment("Fashion MNIST-Random",
+gpu_type = "k80"
+experiment = Experiment( "Fashion MNIST-Custom Random-{}-{}".format(framework, gpu_type),
                          "Perform random grid search",
-                         "tensorflow",
-                         "1.5",
+                         framework,
+                         version,
                          "python",
                          "3.5",
                          studio_utils,
                          project_utils)
 
+experiment_zip = os.path.join("experiment_zips", experiment_zip)
+
 # Create random parameters to search then create a training run for each
 search = create_random_search()
-experiment_zip = os.path.join("..","zips", "fashion_mnist_random_search.zip")
 for index, run_params in enumerate(search):
+
+    # Append hyperparameters to the command
+    command = "python3 experiment.py"
 
     # Specify different GPU types as "k80", "k80x2", "k80x4", "p100", ...
     run_name = "run_%d" % (index + 1)
-    experiment.add_training_run(run_name, run_params, "python3 experiment.py", experiment_zip, "k80")
+
+    # Add the hyperparameters to the experiment.zip (in config.json)
+    updated_experiment_zip = experiment.save_hyperparameters_config(run_params, experiment_zip)
+
+    experiment.add_training_run(run_name, run_params, command, updated_experiment_zip, gpu_type)
 
 # Execute experiment
 experiment.execute()

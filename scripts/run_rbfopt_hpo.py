@@ -9,7 +9,7 @@ from project_utils import ProjectUtils
 from watson_studio_utils import WatsonStudioUtils
 
 # Configure an RBFOpt experiment
-def get_rbfopt_search():
+def get_rbfopt_config():
 
     search = HPOUtils()
     search.add_static_var("batch_size", 128)
@@ -32,9 +32,23 @@ def get_rbfopt_search():
     search.add_step_range("dropout_2", 0.1, 0.9, 0.1)
     search.add_step_range("dropout_3", 0.1, 0.9, 0.1)
     search.add_step_range("dropout_4", 0.1, 0.9, 0.1)
-    search.add_power_range("dense_neurons_1", 6, 11, 2)  # 64 128 256 512 1024 2048
+    search.add_power_range("dense_1", 6, 11, 2)  # 64 128 256 512 1024 2048
 
-    return search
+    # Note: "accuracy" is the objective variable being provided to RBFOpt.
+    # For RBFOpt to function properly then, we must also store the "accuracy"
+    # values to "val_dict_list.json" as shown at the end of the experiment.py file
+    # in the .zip experiment.
+    #
+    # To use a different objective metric, pass the object name here plus update the
+    # experiment.py file to pass the correct values and corresponding name to the "val_dict_list.json"
+    #
+    # Likewise if you want to use iterations instead of epochs, then you must also
+    # change that value both here as well as in the "val_dict_list.json".
+    run_count = 10
+    return search.get_hpo_config(run_count,
+                                 HPOUtils.OBJECTIVE_ACCURACY,
+                                 HPOUtils.TIME_INTERVAL_EPOCH,
+                                 HPOUtils.GOAL_MAXIMIZE)
 
 
 # Initialize various utilities that will make our lives easier
@@ -43,40 +57,34 @@ studio_utils.configure_utilities_from_file()
 
 project_utils = ProjectUtils(studio_utils)
 
+isPyTorch = True # else TensorFlow
+if isPyTorch:
+    framework = "pytorch"
+    version = "0.4"
+    experiment_zip = "dynamic_hyperparms_pt.zip"
+else:
+    framework = "tensorflow"
+    version = "1.5"
+    experiment_zip = "dynamic_hyperparms_tf.zip"
+
+experiment_zip = os.path.join("experiment_zips", experiment_zip)
+
 # Initialize our experiment
-experiment = Experiment("Fashion MNIST-RBFOpt HPO",
+gpu_type = "k80"
+experiment = Experiment("Fashion MNIST-RBFOpt HPO-{}-{}".format(framework, gpu_type),
                         "Perform RBFOpt HPO",
-                        "tensorflow",
-                        "1.5",
+                         framework,
+                         version,
                         "python",
                         "3.5",
                         studio_utils,
                         project_utils)
 
-# Create random parameters to search then create a training run for each
-run_count = 25
-rbfopt_search = get_rbfopt_search()
+# Run RBFOpt to search through the hyperparameters
+hpo_config = get_rbfopt_config()
 
-# Note: "accuracy" is the objective variable being provided to RBFOpt.  For RBFOpt to function properly
-# then, we must also store the "accuracy" values to "val_dict_list.json" as shown at the end of the experiment.py file
-# in the .zip experiment.
-#
-# To use a different objective metric, pass the object name here plus update the
-# experiment.py file to pass the correct values and corresponding name to the "val_dict_list.json"
-#
-# Likewise if you want to use iterations instead of epochs, then you must also change that value both here as well
-# as in the "val_dict_list.json".
-experiment_zip = os.path.join("..","zips", "fashion_mnist_rbfopt.zip")
-rbfopt_experiment_zip = rbfopt_search.save_rbfopt_hpo(experiment_zip,
-                                                      run_count,
-                                                      "accuracy",
-                                                      HPOUtils.TIME_INTERVAL_EPOCH,
-                                                      HPOUtils.GOAL_MAXIMIZE)
-
-# Note: We don't pass hyperparameters for this run as RBFOpt will determine the hyperparameters to pass for
-# each training run as it intelligently explores the hyperparameter space for us.
 # Specify different GPU types as "k80", "k80x2", "k80x4", "p100", ...
-experiment.add_training_run("RBFOpt search", None, "python3 experiment.py", rbfopt_experiment_zip, "k80")
+experiment.add_hpo_run("RBFOpt search", hpo_config, "python3 experiment.py", experiment_zip, gpu_type)
 
 # Execute experiment
 experiment.execute()

@@ -1,7 +1,10 @@
 import json
 import os
 import time
+import zipfile
 
+from pathlib import Path
+from shutil import copyfile
 
 class Experiment:
 
@@ -10,6 +13,7 @@ class Experiment:
                  runtime_name, runtime_version,
                  studio_utils, project_utils):
 
+        self.experiment_name = experiment_name
         self.framework_name = framework_name
         self.framework_version = framework_version
         self.runtime_name = runtime_name
@@ -28,7 +32,7 @@ class Experiment:
         self.wml_client = studio_utils.get_wml_client()
 
         self.experiment_metadata = {
-                    self.wml_client.repository.ExperimentMetaNames.NAME: experiment_name,
+                    self.wml_client.repository.ExperimentMetaNames.NAME: self.experiment_name,
                     self.wml_client.repository.ExperimentMetaNames.DESCRIPTION: experiment_description,
                     self.wml_client.repository.ExperimentMetaNames.TRAINING_DATA_REFERENCE: {
                                     "connection": {
@@ -58,46 +62,13 @@ class Experiment:
         if self.project_utils.get_project_id() is not None and len(self.project_utils.get_project_id()) > 0:
             self.experiment_metadata[self.wml_client.repository.ExperimentMetaNames.TAGS] = [
                 {
-                    "value": "dsx-project.%s" % self.project_utils.get_project_id(),
+                    "value": "dsx-project.{}".format(self.project_utils.get_project_id()),
                     "description": "DSX project guid"
                 }
             ]
 
-    def add_training_run(self, run_name, hyperparameters, command, experiment_zip, gpu_type):
-
-        if self.experiment_metadata is None:
-            raise ValueError("Experiment must first be initialized")
-
-        # Append hyperparameters to the command
-        if hyperparameters is not None:
-            for name in hyperparameters:
-                command = "%s --%s %s" % (command, name, str(hyperparameters[name]))
-
-        # Store training run for execution as part of your experiment.
-        metadata = {
-            self.wml_client.repository.DefinitionMetaNames.NAME: run_name,
-            self.wml_client.repository.DefinitionMetaNames.FRAMEWORK_NAME: self.framework_name,
-            self.wml_client.repository.DefinitionMetaNames.FRAMEWORK_VERSION: self.framework_version,
-            self.wml_client.repository.DefinitionMetaNames.RUNTIME_NAME: self.runtime_name,
-            self.wml_client.repository.DefinitionMetaNames.RUNTIME_VERSION: self.runtime_version,
-            self.wml_client.repository.DefinitionMetaNames.EXECUTION_COMMAND: command
-        }
-        definition_details = self.wml_client.repository.store_definition(experiment_zip, metadata)
-        training_run_url = self.wml_client.repository.get_definition_url(definition_details)
-
-        self.training_references.append({
-            "name": run_name,
-            "training_definition_url": training_run_url,
-            "compute_configuration": {"name": gpu_type}
-        })
-        print("Training run %d added to experiment" % (len(self.training_references)))
-
-        run = TrainingRun(run_name, hyperparameters, self.studio_utils, self.wml_client, self.project_utils.get_results_bucket())
-
-        self.training_runs.append(run)
-
     def execute(self):
-        print("Starting experiment: %s" % (self.experiment_metadata[self.wml_client.repository.ExperimentMetaNames.NAME]))
+        print("Starting experiment: {}".format(self.experiment_name))
 
         # add stored runs to experiment
         self.experiment_metadata[self.wml_client.repository.ExperimentMetaNames.TRAINING_REFERENCES] = self.training_references
@@ -110,7 +81,7 @@ class Experiment:
         self.experiment_run_guid = experiment_run_details["metadata"]["guid"]
         self.__update_training_run_ids()
 
-        print("Experiment started with %d training runs" % len(self.training_references))
+        print("Experiment started with {} training runs".format(len(self.training_references)))
 
         return experiment_run_details, self.experiment_guid
 
@@ -129,15 +100,84 @@ class Experiment:
         for run in self.training_runs:
 
             # Get latest statuses for all runs
-            run.update_status()
+            training_run_details = self.wml_client.training.get_details(run_uid=run.get_guid())
+            #print("training_run_details",json.dumps(training_run_details, indent=2))
+
             summary["training_runs"].append({
                 "name" : run.get_name(),
                 "guid" : run.get_guid(),
-                "status" : run.get_status(),
                 "hyperparameters" : run.get_hyperparameters(),
             })
         print("\n**** Experiment Summary Start ****\n%s" % json.dumps(summary, indent=2))
         print("**** Experiment Summary End ****\n\n")
+
+    # Write hyperparameters to a "config.json" added to the training run's experiment.zip.
+    def save_hyperparameters_config(self, hyperparameters, experiment_zip):
+
+        # "config.json" is also the file passed to our Experiments if you use Watson Studio's HPO.
+        hyperparameters_file = "config.json"
+        if Path(hyperparameters_file).is_file():
+            os.remove(Path(hyperparameters_file))
+
+        with open(hyperparameters_file, "w") as file:
+            file.write(json.dumps(hyperparameters))
+
+        # Append our new hyperparameters file to the existing Experiment's .zip.
+        new_experiment_zip = "hpo_experiment_temp.zip"
+        if Path(new_experiment_zip).is_file():
+            os.remove(Path(new_experiment_zip))
+
+        copyfile(experiment_zip,new_experiment_zip)
+        z = zipfile.ZipFile(new_experiment_zip, "a")
+        z.write(hyperparameters_file)
+
+        # Remove temp file
+        try:
+            os.remove(hyperparameters_file)
+        except OSError as err:
+            print("Error deleting {}: {}".format(hyperparameters_file, err))
+
+        return new_experiment_zip
+
+    def add_hpo_run(self, run_name, hpo_config, command, experiment_zip, gpu_type):
+        self.__add_run(run_name, hpo_config, None, command, experiment_zip, gpu_type)
+
+    def add_training_run(self, run_name, hyperparameters, command, experiment_zip, gpu_type):
+        self.__add_run(run_name, None, hyperparameters, command, experiment_zip, gpu_type)
+
+    # Normally either hpo_config or hyperparameters will be passed but not both.
+    def __add_run(self, run_name, hpo_config, hyperparameters, command, experiment_zip, gpu_type):
+
+        if self.experiment_metadata is None:
+            raise ValueError("Experiment must first be initialized")
+
+        # Store training run for execution as part of your experiment.
+        metadata = {
+            self.wml_client.repository.DefinitionMetaNames.NAME: run_name,
+            self.wml_client.repository.DefinitionMetaNames.FRAMEWORK_NAME: self.framework_name,
+            self.wml_client.repository.DefinitionMetaNames.FRAMEWORK_VERSION: self.framework_version,
+            self.wml_client.repository.DefinitionMetaNames.RUNTIME_NAME: self.runtime_name,
+            self.wml_client.repository.DefinitionMetaNames.RUNTIME_VERSION: self.runtime_version,
+            self.wml_client.repository.DefinitionMetaNames.EXECUTION_COMMAND: command
+        }
+        definition_details = self.wml_client.repository.store_definition(experiment_zip, metadata)
+        training_run_url = self.wml_client.repository.get_definition_url(definition_details)
+
+        training_reference = {
+                    "name": run_name,
+                    "training_definition_url": training_run_url,
+                        "compute_configuration": {"name": gpu_type}
+                }
+
+        if hpo_config is not None:
+            training_reference["hyper_parameters_optimization"] = hpo_config
+        self.training_references.append(training_reference)
+
+        print("Training run %d added to experiment" % (len(self.training_references)))
+
+        run = TrainingRun(run_name, hyperparameters, self.studio_utils, self.wml_client, self.project_utils.get_results_bucket())
+
+        self.training_runs.append(run)
 
     def __update_training_run_ids(self):
 
@@ -152,20 +192,22 @@ class Experiment:
             # Pause 1 second to give time for all runs to have started
             time.sleep(1)
             experiment_run_details = self.wml_client.experiments.get_run_details(self.experiment_run_guid)
-            print("\nexperiment_details", json.dumps(experiment_run_details, indent=2))
 
             # Loop through runs to assign variables.
             for run_status in experiment_run_details["entity"]["training_statuses"]:
                 for run in self.training_runs:
-                    if run.get_name() == run_status["training_reference_name"]:
+                    if run.get_name() == run_status["training_reference_name"] and run_status["training_guid"] is not None:
                         run.set_guid(run_status["training_guid"])
                         runs_started += 1
 
+        print("\nexperiment_details", json.dumps(experiment_run_details, indent=2))
         if runs_started < len(self.training_runs):
             print("Unable to obtain all training run guids")
         else:
             print("All training run guids found")
 
+# Helper class to track run details so we can match to guids and stats coming
+# back from Studio
 class TrainingRun:
 
     def __init__(self, name, hyperparameters, studio_utils, wml_client, results_bucket):
@@ -176,14 +218,6 @@ class TrainingRun:
         self.hyperparameters = hyperparameters
         self.results_bucket = results_bucket
         self.guid = None
-
-        self.status = "pending"
-
-        self.train_accuracy = "not found"
-        self.train_loss = "not found"
-        self.test_accuracy = "not found"
-        self.test_loss = "not found"
-        self.train_time = "not found"
 
     def get_name(self):
         return self.name
@@ -199,15 +233,3 @@ class TrainingRun:
 
     def get_guid(self):
         return self.guid
-
-    def update_status(self):
-
-        if self.status in ["pending"]:
-            training_run_details = self.wml_client.training.get_details(run_uid=self.get_guid())
-            print("training_run_details",json.dumps(training_run_details, indent=2))
-
-    def get_status(self):
-        return self.status
-
-
-

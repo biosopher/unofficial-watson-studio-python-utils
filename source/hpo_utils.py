@@ -6,6 +6,11 @@ import zipfile
 
 class HPOUtils:
 
+    # Accepted objective values for RBFOpt HPO
+    # This value must also be logged manually to "val_dict_list.json"
+    OBJECTIVE_ACCURACY = "accuracy"
+    OBJECTIVE_LOSS = "loss"
+
     # Accepted goal values for RBFOpt HPO
     GOAL_MAXIMIZE = "maximize"
     GOAL_MINIMIZE = "minimize"
@@ -18,10 +23,9 @@ class HPOUtils:
     def __init__(self):
 
         # setup base json structure
-        self.hpo = {}
-        self.root = {"hyper_parameters_optimization": self.hpo}
+        self.root = {}
         self.hyperparameters = []
-        self.hpo["hyper_parameters"] = self.hyperparameters
+        self.root["hyper_parameters"] = self.hyperparameters
 
         self.params_ranges = {}
         self.params_powers = {}
@@ -42,7 +46,7 @@ class HPOUtils:
     # Let WML's HPO capability execute an RBFOpt experiment for us.
     # NOTE: a current limitation of WML's HPO capability is that training runs are executed
     # synchronously rather than parallel.
-    def save_rbfopt_hpo(self, experiment_zip, training_run_count, objective, time_interval, max_or_min):
+    def get_hpo_config(self, training_run_count, objective, time_interval, max_or_min):
 
         if max_or_min.lower() in [HPOUtils.GOAL_MAXIMIZE, HPOUtils.GOAL_MINIMIZE]:
             if time_interval.lower() in [HPOUtils.TIME_INTERVAL_EPOCH,
@@ -72,7 +76,7 @@ class HPOUtils:
             value_list = self.hpo_lists[name]
             self.__add_list_hyperparameter(name, value_list)
 
-        return self.__save_to_zip(experiment_zip)
+        return self.root
 
     def __set_method(self, training_run_count, objective, time_interval, max_or_min):
 
@@ -94,7 +98,7 @@ class HPOUtils:
             "name": "rbfopt",
             "parameters": parameters
         }
-        self.hpo["method"] = method
+        self.root["method"] = method
 
         if time_interval is not None:
             # e.g. 'epoch', 'iteration' or 'step'.  The same name must
@@ -158,32 +162,3 @@ class HPOUtils:
 
         hyperparameter[value_type] = list_values
         self.hyperparameters.append(hyperparameter)
-
-    def __save_to_zip(self, experiment_zip):
-
-        # Write hpo to file for use by WML
-        hpo_params_fname = "hpo_params.json"
-        if Path(hpo_params_fname).is_file():
-            os.remove(hpo_params_fname)
-
-        with open(hpo_params_fname, "w") as file:
-            json_str = json.dumps(self.root, indent=4, sort_keys=True)
-            # print("RBFOpt params being passed:\n%s" % json_str)
-            file.write(json_str)
-
-        # Create temp hpo experiment .zip instead of overwriting existing experiment.
-        temp_zip_fname = "hpo_experiment_temp.zip"
-        if Path(temp_zip_fname).is_file():
-            os.remove(temp_zip_fname)
-
-        # Combine into temp .zip
-        copyfile(experiment_zip, temp_zip_fname)
-        z = zipfile.ZipFile(temp_zip_fname, "a")
-        z.write(hpo_params_fname)
-
-        # Remove temp params file
-        try:
-            os.remove(hpo_params_fname)
-        except OSError as err:
-            print("Error deleting hpo_params.json: {0}".format(err))
-        return temp_zip_fname

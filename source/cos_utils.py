@@ -1,9 +1,11 @@
-import boto3
+import ibm_boto3
 import os
 import random
 import string
 import sys
 import urllib.request
+
+from ibm_botocore.client import Config
 
 
 class CosUtils:
@@ -25,9 +27,12 @@ class CosUtils:
             raise ValueError("Region not recognized: %s. Acceptable values are `us-south` or `eu-gb`" % self.region)
 
         print("cos_service_endpoint: %s" % self.cos_credentials["cos_service_endpoint"])
-        self.cos_client = boto3.client('s3', endpoint_url=self.cos_credentials["cos_service_endpoint"],
-                                             aws_access_key_id=self.cos_credentials["cos_hmac_keys"]["access_key_id"],
-                                             aws_secret_access_key=self.cos_credentials["cos_hmac_keys"]["secret_access_key"])
+        self.cos_client = ibm_boto3.client('s3',
+                                           ibm_api_key_id=self.cos_credentials["apikey"],
+                                           ibm_service_instance_id=self.cos_credentials["resource_instance_id"],
+                                           ibm_auth_endpoint="https://iam.ng.bluemix.net/oidc/token",
+                                           config=Config(signature_version="oauth"),
+                                           endpoint_url=self.cos_credentials["cos_service_endpoint"])
     def get_cos_client(self):
         return self.cos_client
 
@@ -57,7 +62,7 @@ class CosUtils:
         print('Bucket created: %s' % bucket)
 
     # Download file from a URL then upload to the given COS bucket
-    def transfer_remote_file_to_bucket(self,file_url,file_name,bucket,save_directory=None):
+    def transfer_remote_file_to_bucket(self, file_url, file_name, bucket, save_directory=None, redownload=False):
 
         # If save directory provided then don't delete local downloads
         working_directory = "temp_cos_files"
@@ -67,13 +72,18 @@ class CosUtils:
         os.makedirs(working_directory, exist_ok=True)
 
         # Delete file if present as perhaps download failed and file corrupted
+        is_downloaded = False
         file_path = os.path.join(working_directory, file_name)
         if os.path.exists(file_path):
-            os.remove(file_path)
+            if redownload:
+                os.remove(file_path)
+            else:
+                is_downloaded = True
 
-        file_path, _ = urllib.request.urlretrieve(file_url, file_path)
-        stat_info = os.stat(file_path)
-        print('Downloaded', file_name, stat_info.st_size, 'bytes.')
+        if not is_downloaded:
+            file_path, _ = urllib.request.urlretrieve(file_url, file_path)
+            stat_info = os.stat(file_path)
+            print('Downloaded', file_name, stat_info.st_size, 'bytes.')
 
         print("Uploading %s to bucket: %s" % (file_name,bucket))
         self.cos_client.upload_file(file_path, bucket, file_name)
@@ -104,10 +114,8 @@ class CosUtils:
                     self.cos_client.download_fileobj(bucket, file_to_download, file)
                 except:
                     e = sys.exc_info()[0]
-                    print(e.__dict__)
-                    if e.response != None:
-                        print("Detailed error: ", e.response)
                     print('An error occured downloading %s from %s' % (file_to_download, bucket))
+                    print("Detailed error: ", e)
                     os.remove(local_file)
                 finally:
                     file.close()

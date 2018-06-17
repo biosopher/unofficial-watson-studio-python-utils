@@ -2,8 +2,7 @@ import json
 import sys
 
 # Add our source directory to the path as Python doesn't like sub-directories
-source_path = os.path.join("..","source")
-sys.path.insert(0, source_path)
+sys.path.insert(0, './source')
 from watson_studio_utils import WatsonStudioUtils
 
 studio_utils = WatsonStudioUtils(region="us-south")

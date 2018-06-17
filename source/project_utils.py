@@ -59,27 +59,46 @@ class ProjectUtils:
             print('\nCreating data and results buckets in COS')
             cos_utils = self.studio_utils.get_cos_utils()
 
+            all_buckets = cos_utils.get_all_buckets()
+            print(all_buckets)
+
             self.data_bucket = cos_utils.create_unique_bucket("fashion-mnist-data")
             self.results_bucket = cos_utils.create_unique_bucket("fashion-mnist-results")
 
             print('\nTransferring Fashion MNIST data to COS')
 
-            train_data_file = "t10k-images-idx3-ubyte.gz"
-            train_labels_file = "t10k-labels-idx1-ubyte.gz"
-            test_data_file = "train-images-idx3-ubyte.gz"
-            test_labels_file = "train-labels-idx1-ubyte.gz"
-            train_data_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/t10k-images-idx3-ubyte.gz"
-            train_labels_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/t10k-labels-idx1-ubyte.gz"
-            test_data_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/train-images-idx3-ubyte.gz"
-            test_labels_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/train-labels-idx1-ubyte.gz"
+            train_data_file = "train-images-idx3-ubyte.gz"
+            train_labels_file = "train-labels-idx1-ubyte.gz"
+            test_data_file = "t10k-images-idx3-ubyte.gz"
+            test_labels_file = "t10k-labels-idx1-ubyte.gz"
+            train_data_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/train-images-idx3-ubyte.gz"
+            train_labels_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/train-labels-idx1-ubyte.gz"
+            test_data_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/t10k-images-idx3-ubyte.gz"
+            test_labels_url = "https://github.com/zalandoresearch/fashion-mnist/raw/master/data/fashion/t10k-labels-idx1-ubyte.gz"
 
             # Provide a save directory to rather than delete local downloaded files
             save_directory = os.path.join("data", "fashion_mnist")
 
-            cos_utils.transfer_remote_file_to_bucket(train_data_url, train_data_file, self.data_bucket, save_directory=save_directory)
-            cos_utils.transfer_remote_file_to_bucket(train_labels_url, train_labels_file, self.data_bucket, save_directory=save_directory)
-            cos_utils.transfer_remote_file_to_bucket(test_data_url, test_data_file, self.data_bucket, save_directory=save_directory)
-            cos_utils.transfer_remote_file_to_bucket(test_labels_url, test_labels_file, self.data_bucket, save_directory=save_directory)
+            cos_utils.transfer_remote_file_to_bucket(train_data_url,
+                                                     train_data_file,
+                                                     self.data_bucket,
+                                                     save_directory=save_directory,
+                                                     redownload=False)
+            cos_utils.transfer_remote_file_to_bucket(train_labels_url,
+                                                     train_labels_file,
+                                                     self.data_bucket,
+                                                     save_directory=save_directory,
+                                                     redownload=False)
+            cos_utils.transfer_remote_file_to_bucket(test_data_url,
+                                                     test_data_file,
+                                                     self.data_bucket,
+                                                     save_directory=save_directory,
+                                                     redownload=False)
+            cos_utils.transfer_remote_file_to_bucket(test_labels_url,
+                                                     test_labels_file,
+                                                     self.data_bucket,
+                                                     save_directory=save_directory,
+                                                     redownload=False)
 
             print('\nFashion MNIST data uploaded to %s' % self.data_bucket)
             print('Results directory created at %s' % self.results_bucket)
