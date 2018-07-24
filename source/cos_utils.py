@@ -94,10 +94,10 @@ class CosUtils:
                 os.remove(file_path)
                 # Don't delete the download directory itself as calls to this method could be multi-threaded
 
-    def get_all_objects_in_bucket(self, bucket):
+    def get_all_objects_in_bucket(self, bucket, prefix=None):
 
         all_objects = []
-        response = self.cos_client.list_objects(Bucket=bucket)
+        response = self.cos_client.list_objects(Bucket=bucket, Prefix=prefix)
         while response['IsTruncated'] is True:
             # Hit max response limit so get next set of objects
             all_objects = all_objects + response['Contents']
@@ -105,10 +105,14 @@ class CosUtils:
         all_objects = all_objects + response['Contents']
         return all_objects
 
-    def download_file(self, bucket, file_to_download, save_path, is_redownload=False):
+    def download_file(self, bucket, file_to_download, save_file, is_redownload=False):
 
-        if not os.path.exists(save_path) or is_redownload:
-            with open(save_path, 'wb') as file:
+        end_of_path = save_file.rfind(os.sep)
+        save_path = save_file[0:end_of_path]
+        os.makedirs(save_path, exist_ok=True)
+
+        if not os.path.exists(save_file) or is_redownload:
+            with open(save_file, 'wb') as file:
                 print("Downloading %s" % file_to_download)  # "\r" allows us to overwrite the same line
                 try:
                     self.cos_client.download_fileobj(bucket, file_to_download, file)

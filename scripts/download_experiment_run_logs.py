@@ -32,7 +32,7 @@ for run in training_runs:
     remote_log_name = "training-log.txt"
     remote_log_file = "%s/%s" % (remote_path,remote_log_name)
 
-    local_path = os.path.join("training_run_logs", experiment_run_guid)
+    local_path = os.path.join("experiment_runs", experiment_run_guid)
     os.makedirs(local_path, exist_ok=True)
 
     local_log_file = os.path.join(local_path, "%s-log.txt" % run_guid)

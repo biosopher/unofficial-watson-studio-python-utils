@@ -44,7 +44,7 @@ studio_utils.configure_utilities_from_file()
 
 project_utils = ProjectUtils(studio_utils)
 
-isPyTorch = False # else TensorFlow
+isPyTorch = False  # else TensorFlow
 if isPyTorch:
     framework = "pytorch"
     version = "0.4"
@@ -80,13 +80,13 @@ for index, run_params in enumerate(search):
     # Add the hyperparameters to the experiment.zip (in config.json)
     updated_experiment_zip = experiment.save_hyperparameters_config(run_params, experiment_zip)
 
-    experiment.add_training_run(run_name, run_params, command, updated_experiment_zip, gpu_type)
+    experiment.add_training_run(run_name, command, updated_experiment_zip, gpu_type)
 
 # Execute experiment
 experiment.execute()
 
 # Print the current status of the Experiment.
-experiment.print_experiment_summary()
+#experiment.print_experiment_summary()
 
 # Now you'll want to continuously monitor your experiment.  To do that from the command line,
 # you should use the WML CLI: bx ml monitor training-runs TRAINING_RUN_ID

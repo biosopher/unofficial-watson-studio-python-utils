@@ -28,7 +28,7 @@ class ProjectUtils:
                 self.settings = json.load(json_data)
         else:
             print("No project settings found")
-            self.settings_file = None
+            self.settings = {}
 
     def get_data_bucket(self):
         return self.settings[ProjectUtils.FASHION_MIST_ROOT_KEY][ProjectUtils.FASHION_MIST_DATA_BUCKET_KEY]

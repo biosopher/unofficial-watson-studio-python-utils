@@ -22,3 +22,5 @@ settings/project_save.json
 hpo_experiment_temp/hpo_params.json
 
 hpo_experiment_temp.zip
+
+notebooks/.ipynb_checkpoints/run_random_search-checkpoint.ipynb

@@ -106,7 +106,7 @@ class Experiment:
             summary["training_runs"].append({
                 "name" : run.get_name(),
                 "guid" : run.get_guid(),
-                "hyperparameters" : run.get_hyperparameters(),
+                "metadata" : run.get_metadata(),
             })
         print("\n**** Experiment Summary Start ****\n%s" % json.dumps(summary, indent=2))
         print("**** Experiment Summary End ****\n\n")
@@ -139,14 +139,10 @@ class Experiment:
 
         return new_experiment_zip
 
-    def add_hpo_run(self, run_name, hpo_config, command, experiment_zip, gpu_type):
-        self.__add_run(run_name, hpo_config, None, command, experiment_zip, gpu_type)
+    def set_rbfopt_config(self, rbfopt_config):
+        self.rbfopt_config = rbfopt_config
 
-    def add_training_run(self, run_name, hyperparameters, command, experiment_zip, gpu_type):
-        self.__add_run(run_name, None, hyperparameters, command, experiment_zip, gpu_type)
-
-    # Normally either hpo_config or hyperparameters will be passed but not both.
-    def __add_run(self, run_name, hpo_config, hyperparameters, command, experiment_zip, gpu_type):
+    def add_training_run(self, run_name, command, experiment_zip, gpu_type):
 
         if self.experiment_metadata is None:
             raise ValueError("Experiment must first be initialized")
@@ -169,13 +165,13 @@ class Experiment:
                         "compute_configuration": {"name": gpu_type}
                 }
 
-        if hpo_config is not None:
-            training_reference["hyper_parameters_optimization"] = hpo_config
+        if self.rbfopt_config is not None:
+            training_reference["hyper_parameters_optimization"] = self.rbfopt_config.get_hpo_config()
         self.training_references.append(training_reference)
 
         print("Training run %d added to experiment" % (len(self.training_references)))
 
-        run = TrainingRun(run_name, hyperparameters, self.studio_utils, self.wml_client, self.project_utils.get_results_bucket())
+        run = TrainingRun(run_name, metadata, self.studio_utils, self.wml_client, self.project_utils.get_results_bucket())
 
         self.training_runs.append(run)
 
@@ -210,23 +206,20 @@ class Experiment:
 # back from Studio
 class TrainingRun:
 
-    def __init__(self, name, hyperparameters, studio_utils, wml_client, results_bucket):
+    def __init__(self, name, metadata, studio_utils, wml_client, results_bucket):
 
         self.studio_utils = studio_utils
         self.wml_client = wml_client
         self.name = name
-        self.hyperparameters = hyperparameters
+        self.metadata = metadata
         self.results_bucket = results_bucket
         self.guid = None
 
     def get_name(self):
         return self.name
 
-    def get_hyperparameters(self):
-        return self.hyperparameters
-
-    def hyperparameters_to_json(self):
-        return json.dumps(self.hyperparameters, indent=4, sort_keys=True)
+    def get_metadata(self):
+        return self.metadata
 
     def set_guid(self, guid):
         self.guid = guid

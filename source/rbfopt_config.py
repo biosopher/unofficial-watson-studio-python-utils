@@ -4,7 +4,7 @@ from pathlib import Path
 from shutil import copyfile
 import zipfile
 
-class HPOUtils:
+class RBFOptConfig:
 
     # Accepted objective values for RBFOpt HPO
     # This value must also be logged manually to "val_dict_list.json"
@@ -20,7 +20,12 @@ class HPOUtils:
     TIME_INTERVAL_ITERATION = "iteration"
     TIME_INTERVAL_STEP = "step"
 
-    def __init__(self):
+    def __init__(self, training_run_count, objective, time_interval, max_or_min):
+
+        self.training_run_count = training_run_count
+        self.objective = objective
+        self.time_interval = time_interval
+        self.max_or_min = max_or_min
 
         # setup base json structure
         self.root = {}
@@ -46,17 +51,9 @@ class HPOUtils:
     # Let WML's HPO capability execute an RBFOpt experiment for us.
     # NOTE: a current limitation of WML's HPO capability is that training runs are executed
     # synchronously rather than parallel.
-    def get_hpo_config(self, training_run_count, objective, time_interval, max_or_min):
+    def get_hpo_config(self):
 
-        if max_or_min.lower() in [HPOUtils.GOAL_MAXIMIZE, HPOUtils.GOAL_MINIMIZE]:
-            if time_interval.lower() in [HPOUtils.TIME_INTERVAL_EPOCH,
-                                         HPOUtils.TIME_INTERVAL_ITERATION,
-                                         HPOUtils.TIME_INTERVAL_STEP]:
-                self.__set_method(training_run_count, objective, time_interval, max_or_min)
-            else:
-                raise Exception("Invalid time interval.  Must be 'epoch', 'iteration' or 'step'")
-        else:
-            raise Exception("Invalid method type.  Must be 'maximize' or 'minimize'")
+        self.__set_method()
 
         for name in self.params_ranges:
             min_val = self.params_ranges[name][0]
@@ -78,7 +75,16 @@ class HPOUtils:
 
         return self.root
 
-    def __set_method(self, training_run_count, objective, time_interval, max_or_min):
+    def __set_method(self):
+
+        if self.max_or_min.lower() in [RBFOptConfig.GOAL_MAXIMIZE, RBFOptConfig.GOAL_MINIMIZE]:
+            if self.time_interval.lower() not in [RBFOptConfig.TIME_INTERVAL_EPOCH,
+                                                  RBFOptConfig.TIME_INTERVAL_ITERATION,
+                                                  RBFOptConfig.TIME_INTERVAL_STEP]:
+                raise Exception("Invalid time interval.  Must be 'epoch', 'iteration' or 'step'")
+        else:
+            raise Exception("Invalid method type.  Must be 'maximize' or 'minimize'")
+
 
         parameters = [
             {
@@ -90,7 +96,7 @@ class HPOUtils:
             },{
                 # How many training runs should be executed
                 "name":"num_optimizer_steps",
-                "int_value": training_run_count
+                "int_value": self.training_run_count
             }
         ]
 
@@ -100,27 +106,27 @@ class HPOUtils:
         }
         self.root["method"] = method
 
-        if time_interval is not None:
+        if self.time_interval is not None:
             # e.g. 'epoch', 'iteration' or 'step'.  The same name must
             # be provided when saving your metrics logs at the end of training
             parameters.append({
                 "name": "time_interval",
-                "string_value": time_interval
+                "string_value": self.time_interval
             })
 
-        if objective is not None:
+        if self.objective is not None:
             # e.g. "accuracy" or "loss".  The same name must be provided when saving your objecte's values
             # to <val_dict_list.json>  the end of training
             parameters.append({
                 "name": "objective",
-                "string_value": objective
+                "string_value": self.objective
             })
 
-        if max_or_min is not None:
+        if self.max_or_min is not None:
             # Must be 'maximize' or 'minimize'
             parameters.append({
                 "name": "maximize_or_minimize",
-                "string_value": max_or_min
+                "string_value": self.max_or_min
             })
 
     def __add_hyperparameter(self, name, min_val, max_val, step_type, step_value):
