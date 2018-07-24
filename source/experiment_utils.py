@@ -24,6 +24,7 @@ class Experiment:
 
         self.experiment_guid = None
         self.experiment_run_guid = None
+        self.rbfopt_config = None
 
         self.training_runs = []
         self.training_references = []
