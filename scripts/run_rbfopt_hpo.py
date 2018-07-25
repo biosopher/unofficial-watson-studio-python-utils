@@ -11,7 +11,10 @@ from watson_studio_utils import WatsonStudioUtils
 # Configure an RBFOpt experiment
 def get_rbfopt_config():
 
-    run_count = 5
+    # For RBFOpt to execute, we must request more runs than individual parameters explored
+    # else WML's HPO facility will simply run a random search.
+    run_count = 15
+
     config = RBFOptConfig(run_count,
                           RBFOptConfig.OBJECTIVE_ACCURACY,
                           RBFOptConfig.TIME_INTERVAL_EPOCH,
